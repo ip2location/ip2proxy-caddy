@@ -1,0 +1,25 @@
+{
+    # Globally instruct Caddy to run your plugin before it processes FastCGI
+    order ip2proxy before php_fastcgi
+}
+
+example.com {
+    # Set the root folder where your PHP files (like index.php) live 
+    root * /var/www/html
+
+    # 1. First, look up the IP and inject the proxy detection headers
+    ip2proxy {
+        mode local
+        bin_path /path/to/IP2PROXY-IP-PROXYTYPE-COUNTRY-REGION-CITY-ISP-DOMAIN-USAGETYPE-ASN-LASTSEEN-THREAT-RESIDENTIAL-PROVIDER-FRAUDSCORE.BIN
+        # mode remote
+        # api_key <YOUR_API_KEY>
+        header_prefix X-IP2Proxy
+    }
+
+    # 2. Then, pass the request (with headers included) to PHP-FPM
+    # (Adjust the path to your actual php-fpm socket or use 127.0.0.1:9000)
+    php_fastcgi unix//run/php/php8.4-fpm.sock
+
+    # 3. Serve static files (images, CSS, JS) directly if they exist
+    file_server
+}
